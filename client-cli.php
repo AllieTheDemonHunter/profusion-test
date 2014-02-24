@@ -92,7 +92,7 @@ Sending rows
 			}
 			break;
 		case "-f":
-			$check_statement = $pdo_destination->prepare("SELECT * FROM source_cdr");
+			$check_statement = $pdo_source->prepare("SELECT * FROM source_cdr");
 			$check_statement->execute();
 			print_r($check_statement->fetchAll());
 			break;
