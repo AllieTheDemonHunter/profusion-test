@@ -51,7 +51,6 @@ This is a command line PHP script with one option.
 					AND `source_cdr`.`ID` NOT IN (".$sql_snip.")";
 			$check_statement = $pdo_source->prepare($check_sql);
 			$check_statement->execute();
-			
 			$count = $check_statement->rowCount();
 			if($count > 0){
 				$percentage_increments = (100/$count);
@@ -80,7 +79,14 @@ Sending rows
 						");
 					$start_time = time();
 					sleep(1);
-					$copy_statement->execute($result);
+					
+					if($copy_statement->execute($result)) {
+						$status = "OK";
+					} else {
+						$status = "ERROR";
+					}
+					$audit_statement = $pdo_destination->prepare("INSERT INTO cdr_transfer_audit (clid,status) VALUES (?, ?)");
+					$audit_statement->execute(array($result[4], $status));
 					$time_taken += (time() - $start_time);
 				}
 				print " |100% - Done in ".$time_taken." seconds
@@ -88,7 +94,7 @@ Sending rows
 ";
 			} else {
 				print "No suitable rows were found to copy (prevents duplication).
-";				
+";
 			}
 			break;
 		case "-f":
